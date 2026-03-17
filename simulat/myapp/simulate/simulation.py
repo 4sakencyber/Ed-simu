@@ -14,25 +14,6 @@ from .path_search import generate_target_path, dijkstra_pathfinding, generate_gr
 ## new import for radiation simulation
 from .radiation import RadiationReactor, RadiationOther
 
-def initialize_persons(num_persons, leader = False, panic=0, expV=1.3):
-    """初始化人员"""
-    
-    # 创建人员
-    persons = {}
-
-    return persons
-
-def initialize_persons_per_chamber(num_persons_per_chamber,  leader = False, panic=0, expV=1.3):
-    """
-    初始化人员，每个房间内生成指定数量的人员。
-    """
-    persons = {}
-    return persons
-
-def format_float(val, decimals=2):
-    """辅助函数：确保浮点数精度符合你的可视化要求"""
-    return round(float(val), decimals)
-
 def run_simulation_export_channel(num_persons,  
                                random_pos=True, leader=False, 
                                panic=0, expV=1.3):
@@ -62,27 +43,9 @@ def run_simulation_export_channel(num_persons,
     A0_list = [100.0, 50.0, 80.0]  # 初始活度
 
     reactor_solution = radiation_reactor.simulate_nuclides(nuclide_params_list, t_span, t_eval, A0_list=A0_list)
-    other_solution_1 = radiation_other.simulate_nuclides(
-        nuclide_params_list, 
-        reactor_solution, 
-        t_span, 
-        t_eval, 
-        A0_list=[0.0] * len(nuclide_params_list)
-    )
-    other_solution_2 = radiation_other.simulate_nuclides(
-        nuclide_params_list, 
-        other_solution_1, 
-        t_span, 
-        t_eval, 
-        A0_list=[0.0] * len(nuclide_params_list)
-    )
-    other_solution_3 = radiation_other.simulate_nuclides(
-        nuclide_params_list, 
-        other_solution_2, 
-        t_span, 
-        t_eval, 
-        A0_list=[0.0] * len(nuclide_params_list)
-    )
+    other_solution_1 = radiation_other.simulate_nuclides()
+    other_solution_2 = radiation_other.simulate_nuclides()
+    other_solution_3 = radiation_other.simulate_nuclides()
 
 
 
@@ -116,21 +79,9 @@ def run_simulation_export_channel(num_persons,
             #     reactor_solution.t, 
             #     reactor_solution.y.sum(axis=0)
             # )
-            current_other_activity_1 = np.interp(
-                current_time, 
-                other_solution_1.t, 
-                other_solution_1.y.sum(axis=0)
-            )
-            current_other_activity_2 = np.interp(
-                current_time, 
-                other_solution_2.t, 
-                other_solution_2.y.sum(axis=0)
-            )
-            current_other_activity_3 = np.interp(
-                current_time, 
-                other_solution_3.t, 
-                other_solution_3.y.sum(axis=0)
-            )
+            current_other_activity_1 = np.interp()
+            current_other_activity_2 = np.interp()
+            current_other_activity_3 = np.interp()
 
             # --- 构建活度查找表 ---
             # Chamber ID are 1, 2, 3. 
