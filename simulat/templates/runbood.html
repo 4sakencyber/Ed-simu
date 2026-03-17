@@ -1,0 +1,507 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>🛥️模拟平台</title>
+
+    <link href="{% static 'plugins/bootstrap-5.3.0-alpha1-dist/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'plugins/bootstrap-5.3.0-alpha1-dist/css/bootstrap-icons.min.css' %}" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "/static/js/three/three.module.js",
+            "three/addons/controls/OrbitControls.js": "/static/js/three/OrbitControls.js"
+        }
+    }
+    </script>
+
+    <script>// 日志管理系统
+        let logsData = JSON.parse(localStorage.getItem('systemLogs')) || [];
+        let currentFilter = 'all';
+
+        const logIcons = { success: '✓', warning: '⚠', error: '✕', info: 'ℹ' };
+        const logColors = { success: '#10b981', warning: '#f59e0b', error: '#ef4444', info: '#3b82f6' };
+
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = { timestamp, message, type };
+            logsData.push(logEntry);
+            localStorage.setItem('systemLogs', JSON.stringify(logsData));
+            renderLogs();
+        }
+
+        function renderLogs() {
+            const logBox = document.getElementById('logBox');
+            if (!logBox) return; // 如果logBox不存在，直接返回
+
+            const filtered = currentFilter === 'all'
+                ? logsData
+                : logsData.filter(log => log.type === currentFilter);
+
+            logBox.innerHTML = filtered.length
+                ? filtered.map(log => `<span style="color: #06b6d4;">[${log.timestamp}]</span> <span style="color: ${logColors[log.type] || '#94a3b8'};">${logIcons[log.type]} ${log.message}</span><br>`).join('')
+                : '<span style="color: #64748b;">暂无日志记录</span>';
+
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        function filterLogs(type) {
+            currentFilter = type;
+            renderLogs();
+        }
+
+        function clearLogs() {
+            if (confirm('确认清空所有日志？')) {
+                logsData = [];
+                localStorage.removeItem('systemLogs');
+                renderLogs();
+            }
+        }
+
+        function exportLogs() {
+            const content = logsData.map(log => `[${log.timestamp}] [${log.type.toUpperCase()}] ${log.message}`).join('\n');
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `system-logs-${new Date().toISOString().slice(0, 10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function showPage(pageId) {
+
+            // 页面切换
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+
+            // 菜单高亮
+            document.querySelectorAll('.sidebar .nav-link').forEach(a => {
+                a.classList.remove('active');
+            });
+
+            document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
+        }
+        function startSim() { addLog('模拟已启动', 'success'); }
+        function pauseSim() { addLog('模拟已暂停', 'warning'); }
+        function resetSim() { addLog('模拟已重置', 'info'); }
+
+        // 等待DOM加载完成后初始化日志显示
+        window.addEventListener('load', () => {
+            const logBox = document.getElementById('logBox');
+            if (logBox) {
+                renderLogs();
+            }
+        });
+    </script>
+
+</head>
+
+<body>
+
+    <!-- 顶部 -->
+
+    <nav class="navbar navbar-dark">
+
+        <div class="container-fluid">
+
+            <span class="navbar-brand">
+                三维模拟平台
+            </span>
+
+            <span class="small text-secondary">
+                Enterprise Simulation System
+            </span>
+
+        </div>
+
+    </nav>
+
+    <div class="d-flex">
+
+        <!-- 左侧菜单 -->
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar bg-dark text-white p-3">
+
+            <button class="btn btn-outline-light mb-3" onclick="toggleSidebar()">
+                ☰
+            </button>
+
+            <ul class="nav flex-column">
+
+                <li class="nav-item">
+                    <a data-page="simulation" class="nav-link" href="#"
+                        onclick="event.preventDefault(); showPage('simulation')">
+                        <span class="menu-icon">🧪</span>
+                        <span class="menu-text">🧪</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a data-page="monitor" class="nav-link" href="#"
+                        onclick="event.preventDefault(); showPage('monitor')">
+                        <span class="menu-icon">📊</span>
+                        <span class="menu-text">📊</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a data-page="logs" class="nav-link" href="#" onclick="event.preventDefault(); showPage('logs')">
+                        <span class="menu-icon">📜</span>
+                        <span class="menu-text">📜</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a data-page="settings" class="nav-link" href="#"
+                        onclick="event.preventDefault(); showPage('settings')">
+                        <span class="menu-icon">⚙️</span>
+                        <span class="menu-text">⚙️</span>
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        <!-- 主区域 -->
+
+        <div class="flex-fill main">
+
+            <!-- 模拟页面 -->
+
+            <div id="simulation" class="page active">
+
+                <h4 class="mb-4">模拟</h4>
+
+                <div class="row">
+
+                    <div class="col-md-2">
+
+                        <div class="panel-card">
+
+                            <div class="card p-3">
+
+                                <div class="mb-3">
+                                    <label for="totalPeople" class="form-label">模拟总人数</label>
+                                    <input id="totalPeople" type="number" class="form-control" value="10">
+                                </div>
+
+                                <div class="mb-3 form-check form-switch">
+                                    <input id="randomPosition" class="form-check-input" type="checkbox" checked>
+                                    <label class="form-check-label" for="randomPosition">
+                                        随机位置
+                                    </label>
+                                </div>
+
+                                <div class="mb-3 form-check form-switch">
+                                    <input id="hasLeader" class="form-check-input" type="checkbox">
+                                    <label class="form-check-label" for="hasLeader">
+                                        领导者存在
+                                    </label>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="panicFactor" class="form-label">恐慌系数</label>
+                                    <input id="panicFactor" type="number" step="0.01" class="form-control" value="0">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="desiredSpeed" class="form-label">期望速度</label>
+                                    <input id="desiredSpeed" type="number" step="0.1" class="form-control" value="1.3">
+                                </div>
+
+                                <div class="d-grid mt-3">
+                                    <button class="btn btn-primary" onclick="send_meta()">
+                                        📤 应用当前参数
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2 mt-4">
+
+                                <button id="simBtn" class="btn btn-success" onclick="toggleSim()">
+                                    ▶
+                                </button>
+
+                                <button class="btn btn-danger" onclick="resetSimUI()">
+                                    🔄
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-9">
+
+                        <div id="viewer" class="viewer">
+                            <div class="viewer-label">3D Simulation</div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-1">
+
+                        <div class="panel-card">
+                            <h6 class="text-info">元数据</h6>
+                            <div id="meta-data-1" class="data-box">
+                                加载中...
+                            </div>
+                        </div>
+
+                        <div class="panel-card">
+                            <h6 class="text-info">人员数据</h6>
+                            <div id="turtles-data-2" class="data-box">
+                                加载中...
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div> <!-- end #simulation -->
+
+            <!-- 数据监控 -->
+
+            <div id="monitor" class="page">
+
+                <h4>数据监控</h4>
+
+                <div class="panel-card">
+
+                    <p>实时浓度曲线（未来可接入图表库）</p>
+
+                </div>
+
+            </div>
+
+
+            <!-- 日志 -->
+
+            <div id="logs" class="page">
+
+                <h4 class="mb-4">系统日志</h4>
+
+                <div class="panel-card">
+
+                    <div class="d-flex gap-2 mb-3">
+                        <button class="btn btn-sm btn-outline-primary" onclick="filterLogs('all')">全部</button>
+                        <button class="btn btn-sm btn-outline-success" onclick="filterLogs('success')">成功</button>
+                        <button class="btn btn-sm btn-outline-warning" onclick="filterLogs('warning')">警告</button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="filterLogs('error')">错误</button>
+                        <button class="btn btn-sm btn-outline-secondary ms-auto" onclick="clearLogs()">清空日志</button>
+                        <button class="btn btn-sm btn-outline-info" onclick="exportLogs()">导出日志</button>
+                    </div>
+
+                    <div id="logBox"
+                        style="background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 5px; height: 500px; overflow-y: auto; font-size: 13px; font-family: 'Courier New', monospace; color: #cbd5e1; line-height: 1.8;">
+
+                        <span style="color: #06b6d4;">[14:07:52]</span> <span style="color: #10b981;">✓ System
+                            Ready</span><br>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- 设置 -->
+
+            <div id="settings" class="page">
+
+                <h4 class="mb-4">系统设置</h4>
+
+                <form id="settingsForm">
+
+                    <!-- 模型参数 -->
+                    <h5 class="mb-3">SFM模型参数</h5>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-3 panel-card">
+                            <label>A_SOCIAL社会力参数A (N)</label>
+                            <input type="number" class="form-control" id="A" value="2000.0">
+                        </div>
+
+                        <div class="col-md-3 panel-card">
+                            <label>B_SOCIAL社会力参数B (m)</label>
+                            <input type="number" class="form-control" id="B" value="0.08">
+                        </div>
+
+                        <div class="col-md-3 panel-card">
+                            <label>TAU响应时间</label>
+                            <input type="number" class="form-control" id="TFU" value="0.5">
+                        </div>
+
+                        <div class="col-md-3 panel-card">
+                            <label>V0期望速度</label>
+                            <input type="number" class="form-control" id="V0" value="2.4">
+                        </div>
+
+                        <div class="col-md-3 panel-card">
+                            <label>PERSON_RADIUS人员半径 (m)</label>
+                            <input type="number" class="form-control" id="P_RADIUS" value="0.3">
+                        </div>
+
+                        <div class="col-md-3 panel-card">
+                            <label>DT时间步长 (s)</label>
+                            <input type="number" class="form-control" id="DT" value="0.05">
+                        </div>
+
+                        <div class="col-md-3 panel-card">
+                            <label>k压缩系数</label>
+                            <input type="number" class="form-control" id="k" value="0.5">
+                        </div>
+
+                        <div class="col-md-3 panel-card">
+                            <label>Kappa摩擦系数</label>
+                            <input type="number" class="form-control" id="Kappa" value="0.5">
+                        </div>
+
+                    </div>
+
+
+                    <hr class="my-4">
+
+
+                    <!-- 环境参数 -->
+                    <h5 class="mb-3">环境参数</h5>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-3 panel-card">
+                            <label>STAIR_HORISON楼梯水平长度 (m)</label>
+                            <input type="number" class="form-control" id="S_HORISON" value="2.0">
+                        </div>
+
+                        <div class="col-md-3 panel-card">
+                            <label>STAIR_WIDTH楼梯宽度 (m)</label>
+                            <input type="number" class="form-control" id="S_WIDTH" value="1.0">
+                        </div>
+
+                        <div class="col-md-3 panel-card">
+                            <label>FLOOR_HEIGHT楼层高度 (m)</label>
+                            <input type="number" class="form-control" id="F_HEIGHT" value="4.0">
+                        </div>
+
+                        <div class="col-md-3 panel-card">
+                            <label>REACTOR_RADIUS反应堆半径 (m)</label>
+                            <input type="number" class="form-control" id="R_RADIUS" value="2.5">
+                        </div>
+
+                        <div class="col-md-3 panel-card">
+                            <label>REACTOR_HEIGHT反应堆高度 (m)</label>
+                            <input type="number" class="form-control" id="R_HEIGHT" value="5.0">
+                        </div>
+
+                        <div class="col-md-3 panel-card">
+                            <label>GAP间隙 (m)</label>
+                            <input type="number" class="form-control" id="GAP" value="0.5">
+                        </div>
+
+                        <div class="col-md-3 panel-card">
+                            <label>CHAMBER_WIDTH房间宽度 (m)</label>
+                            <input type="number" class="form-control" id="C_WIDTH" value="8.0">
+                        </div>
+
+                        <div class="col-md-3 panel-card">
+                            <label>max_force</label>
+                            <input type="number" class="form-control" id="max_f" value="1000.0">
+                        </div>
+
+                    </div>
+
+                    <!-- 渲染设置 -->
+                    <div class="panel-card mb-4">
+
+                        <label class="form-label">渲染质量</label>
+
+                        <select class="form-select" id="renderQuality">
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+
+                    </div>
+
+                    <!-- 按钮 -->
+                    <div class="mt-4">
+
+                        <button type="button" class="btn btn-primary me-2" onclick="applySettings()">
+                            应用
+                        </button>
+
+                        <button type="button" class="btn btn-secondary" onclick="resetSettings()">
+                            重置
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+    <script type="module" src="{% static 'js/main.js' %}">
+    </script>
+    <script src="{% static 'js/interaction/click.js' %}"></script>
+    <script>
+
+        async function loadData() {
+            try {
+                const [res1, res2] = await Promise.all([
+                    fetch("/myapp/api/meta/"),
+                    fetch("/myapp/api/turtles/")
+                ]);
+
+                if (!res1.ok) throw new Error(`接口1失败：${res1.status}`);
+                if (!res2.ok) throw new Error(`接口2失败：${res2.status}`);
+
+                const data1 = await res1.json();
+                const data2 = await res2.json();
+
+
+                const metaEl = document.getElementById("meta-data-1");
+                const turtlesEl = document.getElementById("turtles-data-2");
+
+                const value1 = data1.value ?? data1.data ?? JSON.stringify(data1);
+                const value2 = data2.value ?? data2.data ?? JSON.stringify(data2);
+
+                if (metaEl) metaEl.innerText = "元数据: " + value1;
+                if (turtlesEl) turtlesEl.innerText = "人员数据: " + value2;
+
+            } catch (error) {
+                console.error("loadData 错误", error);
+                const msg = "数据加载失败：" + (error.message || error);
+                const metaEl = document.getElementById("meta-data-1");
+                const turtlesEl = document.getElementById("turtles-data-2");
+                if (metaEl) metaEl.innerText = msg;
+                if (turtlesEl) turtlesEl.innerText = msg;
+            }
+        }
+
+        window.addEventListener('load', loadData);
+
+    </script>
+
+
+
+</body>
+
+</html>
