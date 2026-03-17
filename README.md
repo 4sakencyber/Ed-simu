@@ -1,104 +1,124 @@
-# 🚀 Ed-simu：事故应急撤离仿真平台
+# 🚀 Ed-simu：Web应急撤离仿真平台
 
-> A Web-based Emergency Evacuation Simulation Platform with Behavior Modeling and Radiation Coupling
+> A Django-based Web Simulation Platform for Emergency Evacuation
 
 ---
 
 ## 📌 项目简介
 
-**Ed-simu** 是一个基于 **Django + Web 前端技术** 构建的事故应急撤离仿真平台原型系统。
-系统支持在复杂建筑环境中，对人员疏散过程进行动态模拟，并结合行为模型与放射性扩散场，实现可视化分析与交互控制。
+**Ed-simu** 是一个基于 **Django** 构建的 Web 应急撤离仿真平台原型系统。
+系统通过浏览器界面实现仿真参数配置、模拟控制以及人员状态数据展示。
 
-该项目主要面向以下应用场景：
+本项目的核心目标是：
 
-* 🚢 海上核动力装置事故应急撤离
-* 🏭 工业设施突发事故人员疏散
-* 🧪 多因素耦合（行为 + 环境）仿真研究
+* 构建一个 **可交互的仿真平台**
+* 实现 **前后端一体化仿真流程**
+* 支持 **人员状态的动态模拟与可视化展示**
+
+> ⚠️ 本项目侧重于平台实现与系统架构设计，不包含复杂路径规划或辐射扩散模型。
 
 ---
 
 ## 🧠 核心功能
 
-### 1️⃣ 仿真参数控制
+### 1️⃣ 参数配置系统
+
+前端提供参数面板，用于控制仿真行为：
 
 * 模拟人数（num_persons）
 * 是否存在领导者（leader）
-* 初始位置随机分布（random_pos）
+* 是否随机分布（random_pos）
 * 恐慌系数（panic）
 * 期望速度（expV）
 
 ---
 
-### 2️⃣ 行为建模（Social Force Model）
+### 2️⃣ 仿真控制机制
 
-系统基于社会力模型（SFM），考虑：
+系统支持完整的仿真控制流程：
 
-* 人员间相互作用力
-* 人员与障碍物作用
-* 驱动力（期望速度）
-* 拥挤与碰撞影响
+* ▶ Start：启动仿真线程
+* ⏸ Pause：暂停仿真
+* ▶ Resume：继续运行
+* 🔄 Reset：重置仿真
 
----
-
-### 3️⃣ 路径搜索与空间建模
-
-* 多层建筑结构建模（房间 / 门 / 楼梯）
-* 路径搜索（Path Finding）
-* 出口导向行为
+通过后端全局状态（state）统一调度。
 
 ---
 
-### 4️⃣ 放射性扩散模拟
+### 3️⃣ 多线程仿真执行
 
-* 支持多核素（I-131, Cs-137, Xe-133 等）
-* 反应堆与舱室扩散建模
-* 剂量累积计算
+仿真运行在独立线程中：
 
----
+* 避免阻塞 Web 请求
+* 支持长时间持续计算
+* 支持动态控制（暂停 / 恢复）
 
-### 5️⃣ 实时仿真数据输出
+核心实现文件：
 
-每一帧输出：
-
-* 人员位置（x, y）
-* 所在楼层 / 房间
-* 是否到达安全区域
-* 是否为领导者
-* 累积辐射剂量
+```
+simulate/simu_runner.py
+simulate/simu_state.py
+```
 
 ---
 
-### 6️⃣ Web 可视化与交互
+### 4️⃣ 人员状态模拟
 
-* 参数面板（左侧控制）
-* 三维仿真展示区域（Three.js）
-* 实时数据监控
-* 系统日志与状态反馈
+系统实现基础人员行为模拟，包括：
+
+* 个体运动更新
+* 群体差异（领导者 / 普通个体）
+* 参数驱动行为变化（panic / expV）
+
+---
+
+### 5️⃣ 数据接口（REST API）
+
+前后端通过 API 交互数据：
+
+| 接口                          | 功能        |
+| --------------------------- | --------- |
+| `/api/meta/`                | 设置/获取仿真参数 |
+| `/api/turtles/`             | 获取人员状态数据  |
+| `/api/simulation/controls/` | 控制仿真运行    |
+| `/api/building/`            | 获取场景数据    |
+
+---
+
+### 6️⃣ Web 可视化界面
+
+系统提供一个完整的仿真控制界面：
+
+* 参数配置面板（左侧）
+* 仿真展示区域（中心）
+* 数据监控模块
+* 系统日志与状态信息
 
 ---
 
 ## 🏗️ 系统架构
 
 ```
-前端（Bootstrap + Three.js）
-        ↓
-REST API（Django）
-        ↓
-仿真引擎（多线程）
-        ↓
-行为模型 + 路径规划 + 辐射模型
+前端（HTML / Bootstrap / JavaScript）
+            ↓
+REST API（Django Views）
+            ↓
+仿真控制层（线程管理）
+            ↓
+人员模拟模块（simulation.py）
 ```
 
 ---
 
 ## ⚙️ 技术栈
 
-| 层级 | 技术                                             |
-| -- | ---------------------------------------------- |
-| 前端 | HTML / CSS / Bootstrap / JavaScript / Three.js |
-| 后端 | Django                                         |
-| 仿真 | Python（多线程）                                    |
-| 通信 | REST API（JSON）                                 |
+| 层级 | 技术                                  |
+| -- | ----------------------------------- |
+| 前端 | HTML / CSS / Bootstrap / JavaScript |
+| 后端 | Django                              |
+| 仿真 | Python（Threading）                   |
+| 通信 | REST API（JSON）                      |
 
 ---
 
@@ -107,34 +127,31 @@ REST API（Django）
 ```
 Ed-simu/
 ├── simulat/
-│   ├── HelloWorld/        # Django 主项目
+│   ├── HelloWorld/        # Django 项目配置
 │   ├── myapp/             # 核心应用
 │   │   ├── simulate/      # 仿真模块
 │   │   │   ├── simulation.py
 │   │   │   ├── person.py
-│   │   │   ├── radiation.py
-│   │   │   ├── path_search.py
 │   │   │   ├── simu_runner.py
 │   │   │   └── simu_state.py
-│   ├── templates/         # 前端页面
+│   ├── templates/         # 页面模板
 │   ├── statics/           # 静态资源
 ```
 
 ---
 
-## 🔄 仿真运行机制
+## 🔄 仿真运行流程
 
 1. 前端设置参数（meta）
-2. 发送至 `/api/meta/`
-3. 用户点击“Start Simulation”
-4. 后端开启仿真线程
-5. 每一帧：
+2. POST 到 `/api/meta/`
+3. 用户点击 Start
+4. 后端启动仿真线程
+5. 仿真循环：
 
    * 更新人员状态
-   * 计算路径与行为
-   * 更新辐射剂量
-   * 通过 API 推送数据
-6. 前端实时渲染结果
+   * 生成数据帧
+   * 发送到 `/api/turtles/`
+6. 前端轮询数据并更新显示
 
 ---
 
@@ -153,9 +170,12 @@ cd Ed-simu
 
 ```bash
 python -m venv venv
-venv\Scripts\activate   # Windows
-# 或
-source venv/bin/activate  # Linux / Mac
+
+# Windows
+venv\Scripts\activate
+
+# Linux / Mac
+source venv/bin/activate
 ```
 
 ---
@@ -168,7 +188,7 @@ pip install django requests numpy
 
 ---
 
-### 4️⃣ 运行服务
+### 4️⃣ 运行项目
 
 ```bash
 cd simulat
@@ -185,22 +205,44 @@ http://127.0.0.1:8000/
 
 ---
 
-## 📊 当前项目状态
+## 📊 当前实现情况
 
-✅ 已实现：
+### ✅ 已完成
 
-* 基础仿真框架
-* 人员行为模型（SFM）
-* 仿真线程控制
-* Web 前端界面
+* Web 仿真平台框架
+* 仿真线程控制机制
+* 参数动态配置
 * REST API 通信
+* 基础人员行为模拟
 
-🚧 进行中：
+### 🚧 待完善
 
-* 三维可视化优化
-* 辐射模型精细化
-* 性能优化（多线程 / 异步）
-* WebSocket 实时通信
+* 前端三维可视化（Three.js）
+* 实时通信（WebSocket）
+* 模型精细化
+* 系统性能优化
+
+---
+
+## 🎓 项目定位
+
+本项目属于：
+
+* 前后端集成系统
+
+适用于：
+
+* 仿真平台开发实践
+* Web 可视化系统设计
+
+---
+
+## 💡 后续优化方向
+
+* 使用 WebSocket 替代轮询
+* 引入 Three.js 三维场景
+* 支持多场景切换
+* 增强前端交互体验
 
 ---
 
@@ -210,6 +252,6 @@ MIT License
 
 ---
 
-## 🤝 作者
+## 👨‍💻 作者
 
 * Weinberg
