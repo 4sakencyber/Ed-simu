@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HelloWorld Digital Twin Console{% endblock %}</title>
+    <link rel="icon" href="data:,">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+    {% block importmap %}
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "/static/js/three/three.module.js",
+            "three/addons/controls/OrbitControls.js": "/static/js/three/OrbitControls.js",
+            "three/addons/loaders/GLTFLoader.js": "/static/js/three/GLTFLoader.js"
+        }
+    }
+    </script>
+    {% endblock %}
+    {% block head_extra %}{% endblock %}
+</head>
+<body {% block body_attrs %}data-theme="night"{% endblock %}>
+    {% block content %}{% endblock %}
+    {% block scripts %}{% endblock %}
+</body>
+</html>

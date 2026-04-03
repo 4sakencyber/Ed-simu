@@ -1,0 +1,205 @@
+<section
+    id="page-simulation"
+    class="page active"
+    data-page-title="仿真工作台"
+    data-page-subtitle="控制参数、场景与个体">
+    <div class="sim-grid">
+        <div class="card controls-card">
+            <h2>仿真控制</h2>
+
+            <label class="field">
+                <span>模拟人数</span>
+                <input id="totalPeople" type="number" min="1" max="300" value="10">
+            </label>
+
+            <label class="field">
+                <span>恐慌系数</span>
+                <input id="panicFactor" type="range" min="0" max="1" step="0.01" value="0">
+                <small id="panicValue">0.00</small>
+            </label>
+
+            <label class="field">
+                <span>期望速度 (m/s)</span>
+                <input id="desiredSpeed" type="range" min="0.8" max="2.8" step="0.05" value="1.3">
+                <small id="speedValue">1.30</small>
+            </label>
+
+            <div class="switch-row">
+                <label><input id="randomPosition" type="checkbox" checked> 随机初始位置</label>
+                <label><input id="hasLeader" type="checkbox"> 启用领队</label>
+            </div>
+
+            <div class="button-row">
+                <button id="applyMetaBtn" class="btn secondary" type="button">应用参数</button>
+                <button id="startBtn" class="btn primary" type="button">开始 / 继续</button>
+                <button id="pauseBtn" class="btn warning" type="button">暂停 / 恢复</button>
+            </div>
+
+            <div class="button-row single">
+                <button id="resetBtn" class="btn ghost" type="button">重置仿真</button>
+            </div>
+
+            <div class="switch-row inline-switch-row">
+                <label><input id="shipVisibleToggle" type="checkbox" checked> 显示船体模型</label>
+            </div>
+        </div>
+
+        <div class="card viewer-card">
+            <div class="viewer-head">
+                <h2>3D 场景</h2>
+                <span id="viewerMetaHint">拖动查看场景</span>
+            </div>
+            <div id="viewer" class="viewer">
+                <div id="viewer-status" class="viewer-label">3D Simulation</div>
+            </div>
+            <div id="selectionPanel" class="inspector">
+                <div class="inspector-head">
+                    <h3>对象信息</h3>
+                    <button id="clearSelectionBtn" class="mini-btn" type="button" disabled>清除</button>
+                </div>
+                <div class="inspector-tools">
+                    <label class="tool-field">
+                        <span>点击筛选</span>
+                        <select id="pickFilterSelect">
+                            <option value="all">全部对象</option>
+                            <option value="person">仅人物</option>
+                            <option value="room">仅房间</option>
+                            <option value="task">仅任务对象</option>
+                            <option value="other">仅其他对象</option>
+                        </select>
+                    </label>
+                    <label class="tool-field">
+                        <span>跟随模式</span>
+                        <select id="trackingModeSelect">
+                            <option value="orbit">自由跟随</option>
+                            <option value="lock">固定跟随</option>
+                            <option value="third">第三人称跟随</option>
+                        </select>
+                    </label>
+                </div>
+                <p id="selectionTitle" class="inspector-title">未选择对象</p>
+                <p id="selectionMeta" class="inspector-meta">点击对象查看详情</p>
+                <div class="inspector-actions">
+                    <button id="resetViewBtn" class="mini-btn" type="button">重置视角</button>
+                    <button id="focusSelectionBtn" class="mini-btn" type="button" disabled>聚焦</button>
+                    <button id="trackBtn" class="mini-btn" type="button" disabled>追踪</button>
+                    <button id="stopTrackBtn" class="mini-btn" type="button" disabled>停止</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="side-stack">
+            <div id="personMonitorCard" class="card person-monitor-card collapsible-card" data-collapsed="false">
+                <div class="card-head">
+                    <h2>个体监视</h2>
+                    <div class="card-head-actions">
+                        <span id="personMonitorBadge" class="mini-badge neutral">等待选中</span>
+                        <button
+                            id="togglePersonMonitorBtn"
+                            class="mini-btn collapse-toggle"
+                            type="button"
+                            aria-expanded="true"
+                            aria-controls="personMonitorDetail">
+                            收起
+                        </button>
+                    </div>
+                </div>
+                <p id="personMonitorTitle" class="monitor-selection-title">暂无监视对象</p>
+                <p id="personMonitorMeta" class="desc">选中人物或输入编号</p>
+                <div class="person-summary-strip">
+                    <span>ID <strong id="personQuickId">-</strong></span>
+                    <span>状态 <strong id="personQuickStatus">-</strong></span>
+                    <span>剂量 <strong id="personQuickDose">-</strong></span>
+                </div>
+                <div id="personMonitorDetail" class="collapse-detail">
+                    <div class="person-toolbar">
+                        <label class="field">
+                            <span>按 ID 查找</span>
+                            <div class="search-inline">
+                                <input id="personSearchInput" type="search" inputmode="numeric" placeholder="输入人员编号">
+                                <button id="personSearchBtn" class="mini-btn" type="button">定位</button>
+                            </div>
+                        </label>
+                        <label class="field">
+                            <span>快速选择</span>
+                            <select id="personQuickSelect">
+                                <option value="">当前无人可选</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="person-attr-grid">
+                        <article><h3>ID</h3><p id="personStatId">-</p></article>
+                        <article><h3>楼层</h3><p id="personStatFloor">-</p></article>
+                        <article><h3>房间</h3><p id="personStatRoom">-</p></article>
+                        <article><h3>区域</h3><p id="personStatRegion">-</p></article>
+                        <article><h3>角色</h3><p id="personStatRole">-</p></article>
+                        <article><h3>状态</h3><p id="personStatStatus">-</p></article>
+                        <article><h3>剂量</h3><p id="personStatDose">-</p></article>
+                        <article><h3>位置</h3><p id="personStatPos">-</p></article>
+                    </div>
+                    <div class="inline-panel dose-insight-panel">
+                        <div class="card-head">
+                            <h3>剂量关注</h3>
+                            <span id="personDoseBand" class="mini-badge neutral">未评级</span>
+                        </div>
+                        <div class="dose-mini-grid">
+                            <article><h3>剂量排名</h3><p id="personDoseRank">-</p></article>
+                            <article><h3>占峰值比</h3><p id="personDoseShare">-</p></article>
+                        </div>
+                        <p id="personDoseHint" class="desc">显示当前剂量等级与排名</p>
+                    </div>
+                    <div class="inspector-actions">
+                        <button id="personFocusBtn" class="mini-btn" type="button" disabled>聚焦</button>
+                        <button id="personTrackBtn" class="mini-btn" type="button" disabled>追踪</button>
+                        <button id="personClearBtn" class="mini-btn" type="button" disabled>清除</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="runtimeCard" class="card runtime-card compact-runtime-card collapsible-card" data-collapsed="false">
+                <div class="card-head">
+                    <h2>运行态势</h2>
+                    <div class="card-head-actions">
+                        <span class="mini-badge info">全体监控</span>
+                        <button
+                            id="toggleRuntimeCardBtn"
+                            class="mini-btn collapse-toggle"
+                            type="button"
+                            aria-expanded="true"
+                            aria-controls="runtimeCardDetail">
+                            收起
+                        </button>
+                    </div>
+                </div>
+                <div class="compact-stat-grid">
+                    <article><h3>总人数</h3><p id="statTotal">0</p></article>
+                    <article><h3>活动中</h3><p id="statActive">0</p></article>
+                    <article><h3>已完成</h3><p id="statFinished">0</p></article>
+                    <article><h3>疏散率</h3><p id="statEvacRate">0.0%</p></article>
+                </div>
+                <div class="runtime-meta-strip">
+                    <span>平均剂量 <strong id="statAvgDose">0.000000</strong></span>
+                    <span>最高剂量 <strong id="statMaxDose">0.000000</strong></span>
+                    <span>累计剂量 <strong id="statTotalDose">0.000000</strong></span>
+                    <span>高剂量人数 <strong id="statHighDoseCount">0</strong></span>
+                    <span>领队 <strong id="statLeaders">0</strong></span>
+                    <span>风险 <strong id="statLevel">LOW</strong></span>
+                </div>
+                <div id="runtimeCardDetail" class="collapse-detail">
+                    <div class="floor-box compact-box">
+                        <h3>楼层分布</h3>
+                        <p id="floorDist">F3:0 / F2:0 / F1:0 / Exit:0</p>
+                    </div>
+                    <div class="inline-panel compact-box">
+                        <h3>当前参数</h3>
+                        <p id="metaSummary" class="desc">等待参数同步...</p>
+                    </div>
+                    <div class="inline-panel compact-box">
+                        <h3>当前关注</h3>
+                        <p id="runtimeFocusHint" class="desc">等待人员数据...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}HelloWorld Digital Twin Console{% endblock %}
+
+{% block content %}
+    {% include "webapp/partials/topbar.html" %}
+
+    <div id="workspace" class="workspace">
+        {% include "webapp/partials/sidebar.html" %}
+
+        <main id="mainPanel" class="main-panel" data-page="simulation">
+            {% include "webapp/partials/panel_header.html" %}
+            {% include "webapp/pages/simulation.html" %}
+            {% include "webapp/pages/monitor.html" %}
+            {% include "webapp/pages/logs.html" %}
+            {% include "webapp/pages/settings.html" %}
+            {% include "webapp/pages/about.html" %}
+        </main>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        window.HelloWorldApi = {
+            meta: "/myapp/api/meta/",
+            turtles: "/myapp/api/turtles/",
+            runtime: "/myapp/api/runtime/",
+            controls: "/myapp/api/simulation/controls/",
+            building: "/myapp/api/building/"
+        };
+    </script>
+    <script type="module" src="{% static 'js/main.js' %}"></script>
+    <script type="module" src="{% static 'js/dashboard.js' %}"></script>
+    <script src="{% static 'js/interaction/click.js' %}"></script>
+{% endblock %}

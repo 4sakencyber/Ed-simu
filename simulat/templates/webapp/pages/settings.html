@@ -1,0 +1,59 @@
+<section
+    id="page-settings"
+    class="page"
+    data-page-title="本地设置"
+    data-page-subtitle="显示与交互">
+    <div class="settings-grid">
+        <div class="card">
+            <h2>显示设置</h2>
+            <label class="field">
+                <span>界面主题</span>
+                <select id="themeModeSelect">
+                    <option value="night">夜间</option>
+                    <option value="day">日间</option>
+                </select>
+            </label>
+            <label class="field">
+                <span>模型透明度</span>
+                <input id="modelOpacitySlider" type="range" min="0.05" max="1.00" step="0.01" value="0.35">
+                <small id="modelOpacityValue">35%</small>
+            </label>
+            <label class="field">
+                <span>渲染质量</span>
+                <select id="renderQuality">
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+            </label>
+            <label class="field">
+                <span>本地采样间隔 (s)</span>
+                <input id="samplingRange" type="range" min="0.2" max="2.0" step="0.05" value="0.6">
+                <small id="samplingValue">0.60</small>
+            </label>
+            <label class="switch-line"><input id="autoSwitchMonitor" type="checkbox"> 仿真自然结束后切换到监控页</label>
+            <div class="button-row">
+                <button id="applySettingsBtn" class="btn primary" type="button">应用设置</button>
+                <button id="resetSettingsBtn" class="btn ghost" type="button">恢复默认</button>
+            </div>
+            <div class="inline-panel settings-status-panel">
+                <h3>预览状态</h3>
+                <p id="settingsStatusTitle" class="desc">当前已应用并保存本地设置。</p>
+                <p id="settingsStatusMeta" class="desc">主题、透明度、采样与交互选项当前保持同步。</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>保留接口</h2>
+            <div class="inline-panel">
+                <ul class="about-list">
+                    <li>`/myapp/api/meta/`</li>
+                    <li>`/myapp/api/turtles/`</li>
+                    <li>`/myapp/api/runtime/`</li>
+                    <li>`/myapp/api/simulation/controls/`</li>
+                    <li>`/myapp/api/building/`</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>

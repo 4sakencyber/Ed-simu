@@ -1,0 +1,50 @@
+<section
+    id="page-monitor"
+    class="page"
+    data-page-title="监控中心"
+    data-page-subtitle="全体数据">
+    <div class="monitor-grid">
+        <div class="card full-width">
+            <div class="card-head">
+                <h2>本轮统计</h2>
+                <button id="clearHistoryBtn" class="mini-btn" type="button">清除历史数据</button>
+            </div>
+            <div class="history-grid">
+                <article><h3>疏散率</h3><p id="monitorEvacRate">0.0%</p></article>
+                <article><h3>活动人数</h3><p id="monitorActive">0</p></article>
+                <article><h3>采样点</h3><p id="monitorSamples">0</p></article>
+                <article><h3>本地轮次</h3><p id="historyRuns">0</p></article>
+                <article><h3>平均剂量</h3><p id="monitorAvgDose">0.000000</p></article>
+                <article><h3>最高剂量</h3><p id="monitorMaxDose">0.000000</p></article>
+                <article><h3>累计剂量</h3><p id="monitorTotalDose">0.000000</p></article>
+                <article><h3>高剂量人数</h3><p id="monitorHighDoseCount">0</p></article>
+            </div>
+        </div>
+
+        <div class="card full-width">
+            <h2>运行曲线</h2>
+            <canvas id="trendChart"></canvas>
+        </div>
+
+        <div class="card full-width">
+            <h2>实时人员列表</h2>
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>楼层</th>
+                            <th>房间</th>
+                            <th>区域</th>
+                            <th>剂量</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody id="liveTableBody">
+                        <tr><td colspan="6" class="empty-cell">等待数据...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,62 @@
+<section
+    id="page-logs"
+    class="page"
+    data-page-title="系统日志"
+    data-page-subtitle="事件与历史">
+    <div class="logs-grid">
+        <div class="card logs-card">
+            <div class="log-head">
+                <h2>系统日志</h2>
+                <div class="log-actions">
+                    <select id="logFilter">
+                        <option value="all">全部</option>
+                        <option value="event">事件</option>
+                        <option value="warn">警告</option>
+                        <option value="error">错误</option>
+                    </select>
+                    <button id="clearLogsBtn" class="mini-btn" type="button">清空</button>
+                    <button id="exportLogsBtn" class="mini-btn" type="button">导出</button>
+                </div>
+            </div>
+            <div class="log-summary">
+                <article><h3>总数</h3><p id="logCountAll">0</p></article>
+                <article><h3>事件</h3><p id="logCountEvent">0</p></article>
+                <article><h3>警告</h3><p id="logCountWarn">0</p></article>
+                <article><h3>错误</h3><p id="logCountError">0</p></article>
+                <article><h3>最近更新</h3><p id="logLastTime">--:--:--</p></article>
+            </div>
+            <div id="logList" class="log-list"></div>
+        </div>
+
+        <div class="card runtime-diagnostics-card">
+            <div class="card-head">
+                <h2>运行态诊断</h2>
+                <span id="runtimeStatusBadge" class="mini-badge neutral">等待快照</span>
+            </div>
+            <p id="runtimeStatusMeta" class="section-note">等待后端运行态快照。</p>
+            <div class="runtime-summary-grid">
+                <article><h3>状态</h3><p id="runtimeStatusText">idle</p></article>
+                <article><h3>线程</h3><p id="runtimeThreadState">--</p></article>
+                <article><h3>帧号</h3><p id="runtimeFrame">0</p></article>
+                <article><h3>最近更新</h3><p id="runtimeUpdatedAt">--</p></article>
+            </div>
+            <div class="inline-panel runtime-endpoint-panel">
+                <p><strong>回调地址</strong><span id="runtimeCallbackUrl">--</span></p>
+                <p><strong>最近错误</strong><span id="runtimeLastError">无</span></p>
+            </div>
+            <div class="card-head">
+                <h3>桥接层日志</h3>
+                <span class="mini-badge neutral">只读</span>
+            </div>
+            <div id="runtimeBridgeLogList" class="log-list compact-log-list"></div>
+        </div>
+
+        <div class="card full-width">
+            <div class="card-head">
+                <h2>最近轮次记录</h2>
+                <span class="mini-badge neutral">本地历史</span>
+            </div>
+            <div id="historyList" class="history-list"></div>
+        </div>
+    </div>
+</section>
